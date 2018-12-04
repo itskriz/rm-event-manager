@@ -63,7 +63,7 @@ if ( ! function_exists('register_rm_event_post_type') ) {
 		register_post_type( 'rm-event', $args );
 
 	}
-	//add_action( 'init', 'register_rm_event_post_type', 0 );
+	add_action( 'init', 'register_rm_event_post_type', 0 );
 
 }
 ?>
