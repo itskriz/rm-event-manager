@@ -1,7 +1,7 @@
 <?php
 /**
-	* Plugin Name: Events Manager by Roar Media
-	* Plugin URI: https://github.com/itskriz/rm-events-manager
+	* Plugin Name: Event Manager by Roar Media
+	* Plugin URI: https://github.com/itskriz/rm-event-manager
 	* Description: A lightweight plugin that adds an events calendar to WordPress.
 	* Version: 0.2
 	* Author: Kris Williams/Roar Media
