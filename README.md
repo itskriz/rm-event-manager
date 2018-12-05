@@ -13,6 +13,8 @@ This plugin is a work in progress. Final product features will include:
 * Calendar and list views
 
 ## Version History
+### 0.3
+Completed the logic for weekly and once series and exclusions in events. Ready to move onto simpler tasks. However, I still have not resolved the small with end-dates for events with new times (ie: if an event begins on 12-5 at 23:00 and ends on 12-6 at 01:00 and one of the event series changes the times to 18:00 and 21:00, the actual time for the series events will still 12-n at 18:00 through 12-n+1 at 21:00). I hope that makes sense.
 ### 0.2
 Made more progress. ACF fields in place. Event series and exclusion logic begun. Currently need to work on Weekly, Monthly, and Once series/exclusions. Also need to work on logic for "New Event Times" in event series of events with end dates later than their start dates.
 ### 0.1

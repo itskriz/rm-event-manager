@@ -186,10 +186,14 @@ class RM_Event {
 						}
 
 					}
-				} else {
+				} elseif (0 == $event_series['frequency']) {
 					// Is Once Series
+					if (!isset($event_series['dates'])) {
+						$event_series['dates'] = array();
+					}
+					$event_series_date = get_sub_field('rm_event_series_once');
+					array_push($event_series['dates'], $event_series_date);
 				}
-
 
 				// Push to event series
 				array_push($this->event_series_dates, $event_series['dates']);
@@ -272,8 +276,9 @@ class RM_Event {
 						}
 					} else {
 						// Is Once Exclusion
+						$event_exclude_date = get_sub_field('rm_event_exclude_once');
+						array_push($event_series_duplicates, $event_exclude_date);
 					}
-
 				} // End While for excludes
 			} // end if for excludes
 
