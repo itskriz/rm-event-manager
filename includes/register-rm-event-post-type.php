@@ -8,7 +8,7 @@ if ( ! function_exists('register_rm_event_post_type') ) {
 			'name'                  => _x( 'Events', 'Post Type General Name', 'roarmedia' ),
 			'singular_name'         => _x( 'Event', 'Post Type Singular Name', 'roarmedia' ),
 			'menu_name'             => __( 'Event Manager', 'roarmedia' ),
-			'name_admin_bar'        => __( 'Event Manager', 'roarmedia' ),
+			'name_admin_bar'        => __( 'Event', 'roarmedia' ),
 			'archives'              => __( 'Event Calendar', 'roarmedia' ),
 			'attributes'            => __( 'Event Attributes', 'roarmedia' ),
 			'parent_item_colon'     => __( 'Parent Event:', 'roarmedia' ),

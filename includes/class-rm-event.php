@@ -5,27 +5,11 @@
 
 
 class RM_Event {
-
-	/*
-	public function get_acf_fields() {
-		$acf_fields = get_field_objects($this->ID);
-		foreach ($acf_fields as $key => $value) {
-			if (!isset($this->acf_fields)) {
-				$this->acf_fields = array();
-			}
-			$acf_field_type = $acf_fields[$key]['type'];
-			if (!isset($this->acf_fields[$acf_field_type])) {
-				$this->acf_fields[$acf_field_type] = array();
-			}
-			array_push($this->acf_fields[$acf_field_type], $key);
-		}
-	}
-	*/
-
+//// Debugger
 	public function debug_acf_fields() {
 		return get_field_objects($this->ID);
 	}
-
+//// ACF Grabber
 	public function get_acf_fields() {
 		$acf_fields = get_field_objects($this->ID);
 		foreach ($acf_fields as $key => $value) {
@@ -38,6 +22,22 @@ class RM_Event {
 			}
 			array_push($this->acf_fields[$type], $key);
 		}
+	}
+
+//// Event Details
+	public function set_event_datetime() {
+		
+		if (get_field('rm_event_allday', $this->ID)) {
+			$this->is_allday = 1;
+		}
+		$event_date = get_field('rm_event_date', $this->ID);
+		$event_time = get_field('rm_event_time', $this->ID);
+		$event_datetime = array(
+			'start'	=> $event_date['start'] . ' ' . $event_time['start'],
+			'end'	=> $event_date['end'] . ' ' . $event_time['end'],
+		);
+		$this->event_datetime = $event_datetime;
+
 	}
 
 //// Event Series
@@ -192,6 +192,9 @@ class RM_Event {
 						$event_series['dates'] = array();
 					}
 					$event_series_date = get_sub_field('rm_event_series_once');
+					// Attach times to dates
+					$event_series_date['start'] = $event_series_date['start'] . ' ' . $event_series['time']['start'];
+					$event_series_date['end'] = $event_series_date['end'] . ' ' . $event_series['time']['end'];
 					array_push($event_series['dates'], $event_series_date);
 				}
 
@@ -313,7 +316,7 @@ class RM_Event {
 
 
 //// CONSTRUCTOR
-	public function __construct($post_id = null) {
+	public function __construct($post_id = null, $build_obj = 1) {
 		// Check if $post_id provided
 		if ($post_id === null || !is_int($post_id)) {
 			// Post is null or post ID isn't an integer
@@ -333,6 +336,10 @@ class RM_Event {
 		// Assign post_obj properties to this object
 		foreach ($post_obj as $key => $value) {
 			$this->$key = $value;
+		}
+		if (1 === $build_obj || true === $build_obj) {
+			$this->set_event_datetime();
+			$this->set_event_series();
 		}
 	}
 

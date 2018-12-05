@@ -31,10 +31,12 @@
 				<main class='content units <?php avia_layout_class( 'content' ); ?> <?php echo avia_blog_class_string(); ?>' <?php avia_markup_helper(array('context' => 'content','post_type'=>'post'));?>>
 
 					<?php
-						$event = new RM_Event(get_the_ID());
-						echo '<pre>';
-						$event->set_event_series();
+						$event_id = get_the_ID();
+						$event = new RM_Event($event_id);
+						echo '<pre style="display: block; margin-right: 15px; width: calc(100% - 15px);">';
+						echo '<strong>BEGIN DEBUG</strong><br>';
 						print_r($event);
+						echo '<strong>END DEBUG</strong>';
 						echo '</pre>';
 					?>
 
