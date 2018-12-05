@@ -123,6 +123,8 @@ class RM_Event {
 						if (!isset($event_series['dates'])) {
 							$event_series['dates'] = array();
 						}
+
+
 						// Set event start date
 						$event_series_date = array();
 						$event_series_date['start'] = $event_date->format('Y-m-d');
@@ -146,8 +148,46 @@ class RM_Event {
 						$event_series_date['start'] = $event_series_date['start'] . ' ' . $event_series['time']['start'];
 						$event_series_date['end'] = $event_series_date['end'] . ' ' . $event_series['time']['end'];
 
-						array_push($event_series['dates'], $event_series_date);
+
+						// Special conditions for weekly recurrenc
+						if (2 == $event_series['frequency']) {
+							$event_series['weekly_days'] = get_sub_field('rm_event_series_weekly_days');
+							$event_series_repeat_day = date('w', strtotime($event_series_date['start']));
+							$event_series_weekly = array();
+							for ($i = 0; $i < count($event_series['weekly_days']); $i++) {
+								if ($event_series_repeat_day < $event_series['weekly_days'][$i]) {
+									// Do before days
+									$day_diff = $event_series_repeat_day - $event_series['weekly_days'][$i];
+									$new_start = strtotime('-'.$day_diff.'day', strtotime($event_series_date['start']));
+									$new_end = strtotime('-'.$day_diff.'day', strtotime($event_series_date['end']));
+									$event_series_weekly['start'] = date('Y-m-d H:i:s', $new_start);
+									$event_series_weekly['end'] = date('Y-m-d H:i:s', $new_end);
+								} elseif ($event_series_repeat_day === $event_series['weekly_days'][$i]) {
+									// Do On Days
+									$event_series_weekly = $event_series_date;
+								} elseif (($event_series_repeat_day > $event_series['weekly_days'][$i])) {
+									// Do after days
+									$day_diff = $event_series['weekly_days'][$i] - $event_series_repeat_day;
+									$new_start = strtotime('+'.$day_diff.'day', strtotime($event_series_date['start']));
+									$new_end = strtotime('+'.$day_diff.'day', strtotime($event_series_date['end']));
+									$event_series_weekly['start'] = date('Y-m-d H:i:s', $new_start);
+									$event_series_weekly['end'] = date('Y-m-d H:i:s', $new_end);
+								}
+								// NEED TO CHECK START DATE FOR EVENT BEFORE ADDING HERE
+								$check_event_series_start = strtotime($event_series['date']['start']);
+								$check_event_weekly_start = strtotime($event_series_weekly['start']);
+								if ($check_event_weekly_start >= $check_event_series_start) {
+									array_push($event_series['dates'], $event_series_weekly);
+								}
+							}
+						} else {
+							// Else just push date
+							array_push($event_series['dates'], $event_series_date);
+						}
+
 					}
+				} else {
+					// Is Once Series
 				}
 
 
@@ -198,8 +238,40 @@ class RM_Event {
 						$event_exclude['daterange'] = new DatePeriod($event_exclude_start, $event_exclude['interval'], $event_exclude_end);
 						// Loop daterange
 						foreach ($event_exclude['daterange'] as $exclude) {
-							array_push($event_series_duplicates, $exclude->format('Y-m-d'));
+							// Speecial conditions for weekly exclusions
+							if (2 == $event_exclude['frequency']) {
+								// Build weekly days
+								$event_exclude['weekly_days'] = get_sub_field('rm_event_exclude_weekly_days');
+								$event_exclude_repeat_day = $exclude->format('w');
+								$event_exclude_weekly = '';
+								for ($i = 0; $i < count($event_exclude['weekly_days']); $i++) {
+									$event_exclude_weekly = $exclude->format('Y-m-d');
+
+									if ($event_exclude_repeat_day < $event_exclude['weekly_days'][$i]) {
+										$excl_diff = $event_exclude_repeat_day - $event_exclude['weekly_days'][$i];
+										$new_excl = $exclude->format('Y-m-d');
+										$new_excl = strtotime('-'.$excl_diff.'day', strtotime($new_excl));
+										$new_excl = date('Y-m-d', $new_excl);
+										$event_exclude_weekly = $new_excl;
+									} elseif ($event_exclude_repeat_day === $event_exclude['weekly_days'][$i]) {
+										$event_exclude_weekly = $exclude->format('Y-m-d');
+									} elseif ($event_exclude_repeat_day > $event_exclude['weekly_days'][$i]) {
+										$excl_diff = $event_exclude['weekly_days'][$i] - $event_exclude_repeat_day;
+										$new_excl = $exclude->format('Y-m-d');
+										$new_excl = strtotime('+'.$excl_diff.'day', strtotime($new_excl));
+										$new_excl = date('Y-m-d', $new_excl);
+										$event_exclude_weekly = $new_excl;
+									}
+
+									array_push($event_series_duplicates, $event_exclude_weekly);
+								}
+							} else {
+								// Not a weekly exclusion
+								array_push($event_series_duplicates, $exclude->format('Y-m-d'));
+							}
 						}
+					} else {
+						// Is Once Exclusion
 					}
 
 				} // End While for excludes
